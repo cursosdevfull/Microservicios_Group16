@@ -1,0 +1,35 @@
+{
+	"name": "microservicios_group16",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"format-and-lint": "biome check --write",
+		"start": "turbo run start",
+		"biome": "turbo run format-and-lint"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/cursosdevfull/Microservicios_Group16.git"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"type": "commonjs",
+	"bugs": {
+		"url": "https://github.com/cursosdevfull/Microservicios_Group16/issues"
+	},
+	"homepage": "https://github.com/cursosdevfull/Microservicios_Group16#readme",
+	"workspaces": [
+		"apps/*"
+	],
+	"private": true,
+	"engines": {
+		"node": ">=22.12.0"
+	},
+	"packageManager": "npm@11.4.2",
+	"devDependencies": {
+		"@biomejs/biome": "2.0.6",
+		"turbo": "^2.5.4"
+	}
+}
