@@ -1,0 +1,20 @@
+{
+    "watch": [
+        "src"
+    ],
+    "ext": "ts",
+    "ignore": [
+        "src/**/*.spec.ts",
+        "src/**/*.test.ts",
+        "node_modules",
+        "dist"
+    ],
+    "verbose": true,
+    "execMap": {
+        "ts": "ts-node -r tsconfig-paths/register"
+    },
+    "env": {
+        "NODE_ENV": "development"
+    },
+    "restartable": "rs"
+}
