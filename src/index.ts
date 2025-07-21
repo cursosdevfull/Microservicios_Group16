@@ -13,17 +13,9 @@ import "./env"
 
     try {
         const serverBootstrap = new ServerBootstrap(app);
-        const databaseBootstrap = new DatabaseBootstrap();
-        const rabbitMQBootstrap = new RabbitMQBootstrap();
-        const redisBootstrap = new RedisBootstrap();
-        const kafkaBootstrap = new KafkaBootstrap();
 
         const listeningPromises = [
             serverBootstrap.initialize(),
-            databaseBootstrap.initialize(),
-            rabbitMQBootstrap.initialize(),
-            kafkaBootstrap.initialize(),
-            redisBootstrap.initialize()
         ]
 
         const results = await Promise.all(listeningPromises)
