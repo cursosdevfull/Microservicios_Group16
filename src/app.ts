@@ -2,6 +2,8 @@ import { Application } from "express";
 import express from 'express';
 import { HealthCheckService } from './core/services/healthcheck.service';
 import { errorHandler, notFoundHandler } from './core/middleware/error.middleware';
+import userRoutes from "./modules/user/presentation/user.routes";
+import { protectionDataPersonalMiddleware } from "@core/middleware/protection-data-personal.middleware";
 
 class App {
     readonly app: Application;
@@ -19,6 +21,7 @@ class App {
     setupMiddleware() {
         this.app.use(express.json());
         this.app.use(express.urlencoded({ extended: true }));
+        this.app.use(protectionDataPersonalMiddleware)
     }
 
     mountRoutes() {
@@ -31,12 +34,11 @@ class App {
                     "GET /health - Overall health check",
                     "GET /healthcheck - Overall health check (alias)",
                     "GET /health/database - Database health check",
-                    "GET /health/redis - Redis health check",
-                    "GET /health/rabbitmq - RabbitMQ health check",
-                    "GET /health/kafka - Kafka health check"
                 ]
             });
         })
+
+        this.app.use("/user/v1", userRoutes)
     }
 
     mountHealthCheck() {
@@ -88,51 +90,6 @@ class App {
             } catch (error: any) {
                 res.status(503).json({
                     service: 'database',
-                    status: 'unhealthy',
-                    message: error.message,
-                    timestamp: new Date().toISOString()
-                });
-            }
-        });
-
-        this.app.get("/health/redis", async (req, res) => {
-            try {
-                const result = await this.healthCheckService.checkRedis();
-                const status = result.status === 'healthy' ? 200 : 503;
-                res.status(status).json(result);
-            } catch (error: any) {
-                res.status(503).json({
-                    service: 'redis',
-                    status: 'unhealthy',
-                    message: error.message,
-                    timestamp: new Date().toISOString()
-                });
-            }
-        });
-
-        this.app.get("/health/rabbitmq", async (req, res) => {
-            try {
-                const result = await this.healthCheckService.checkRabbitMQ();
-                const status = result.status === 'healthy' ? 200 : 503;
-                res.status(status).json(result);
-            } catch (error: any) {
-                res.status(503).json({
-                    service: 'rabbitmq',
-                    status: 'unhealthy',
-                    message: error.message,
-                    timestamp: new Date().toISOString()
-                });
-            }
-        });
-
-        this.app.get("/health/kafka", async (req, res) => {
-            try {
-                const result = await this.healthCheckService.checkKafka();
-                const status = result.status === 'healthy' ? 200 : 503;
-                res.status(status).json(result);
-            } catch (error: any) {
-                res.status(503).json({
-                    service: 'kafka',
                     status: 'unhealthy',
                     message: error.message,
                     timestamp: new Date().toISOString()

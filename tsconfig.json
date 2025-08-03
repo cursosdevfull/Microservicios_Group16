@@ -9,6 +9,8 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "baseUrl": "./",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
     "paths": {
       "@core/*": [
         "src/core/*"
