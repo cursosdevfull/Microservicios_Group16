@@ -109,4 +109,30 @@ export class RegistryService {
             }, {} as Record<string, number>)
         }
     }
+
+    heartbeat(serviceId: string): boolean {
+        const service = this.services.get(serviceId);
+        if (service) {
+            service.lastHeartbeat = new Date();
+            service.status = EnumServiceStatus.HEALTHY;
+            console.log(`Heartbeat received for service ${service.name} (${service.id})`);
+            return true;
+        }
+
+        return false
+    }
+
+    getStats() {
+        const services = Array.from(this.services.values());
+        return {
+            total: services.length,
+            healthy: services.filter(service => service.status === EnumServiceStatus.HEALTHY).length,
+            unhealthy: services.filter(service => service.status === EnumServiceStatus.UNHEALTHY).length,
+            unknown: services.filter(service => service.status === EnumServiceStatus.UNKNOWN).length,
+            servicesByName: services.reduce((acc, service) => {
+                acc[service.name] = (acc[service.name] || 0) + 1;
+                return acc;
+            }, {} as Record<string, number>)
+        }
+    }
 }

@@ -1,16 +1,8 @@
-import { DatabaseBootstrap, RabbitMQBootstrap, RedisBootstrap, KafkaBootstrap, ServerBootstrap } from "@core/bootstrap";
+import { ServerBootstrap } from "@core/bootstrap";
 import app from "./app"
 import "./env"
 
 (async () => {
-    // Server NodeJS
-    // Database Relacional
-    // Cache Redis
-    // Queue RabbitMQ
-    // Transactions Kafka
-    // Microservices
-    // Tasks Cron
-
     try {
         const serverBootstrap = new ServerBootstrap(app);
 
@@ -50,5 +42,4 @@ process.on("SIGTERM", () => {
 
 process.on("exit", (code) => {
     console.log(`Process exited with code: ${code}`);
-    // Perform any necessary cleanup here
 });

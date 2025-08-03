@@ -1,8 +1,12 @@
 import { Application } from "express";
-import express from 'express';
-import { HealthCheckService } from './core/services/healthcheck.service';
-import { errorHandler, notFoundHandler } from './core/middleware/error.middleware';
+import express, { Request, Response } from "express";
+import { HealthCheckService } from "./core/services/healthcheck.service";
+import {
+    errorHandler,
+    notFoundHandler,
+} from "./core/middleware/error.middleware";
 import { RegistryService } from "@core/services";
+import { createRoutes } from "./modules/api";
 
 class App {
     readonly app: Application;
@@ -10,7 +14,7 @@ class App {
     private readonly registry = new RegistryService();
 
     constructor() {
-        this.app = express()
+        this.app = express();
         this.healthCheckService = new HealthCheckService();
         this.setupMiddleware();
         this.mountRoutes();
@@ -24,8 +28,6 @@ class App {
     }
 
     mountRoutes() {
-        //this.app.use("/api", createRoutes(this.registry))
-
         this.app.get("/", (req, res) => {
             res.json({
                 name: "Microservice Discovery",
@@ -34,55 +36,42 @@ class App {
                 endpoints: {
                     health: "/health",
                     healthcheck: "/healthcheck",
-                    register: "/api/register",
-                    heartbeat: "/api/heartbeat/:serviceId",
-                    unregister: "/api/unregister/:serviceId",
+                    register: "/api/services",
+                    heartbeat: "/api/services/:id/heartbeat",
+                    unregister: "/api/services/:id",
                     services: "/api/services",
-                    serviceByName: "/api/services/name/:name"
-                }
+                    serviceByName: "/api/services/name/:name",
+                    serviceById: "/api/services/id/:id",
+                    stats: "/api/stats",
+                },
             });
-        })
+        });
+
+        this.app.use("/api", createRoutes(this.registry));
     }
 
     mountHealthCheck() {
-        // Basic health check routes
-        this.app.get("/health", async (req, res) => {
+        const requestHealth = async (req: Request, res: Response) => {
             try {
                 const healthResult = await this.healthCheckService.checkAllServices();
 
-                if (healthResult.overall === 'healthy') {
+                if (healthResult.overall === "healthy") {
                     res.status(200).json(healthResult);
                 } else {
                     res.status(503).json(healthResult);
                 }
             } catch (error: any) {
                 res.status(503).json({
-                    overall: 'unhealthy',
+                    overall: "unhealthy",
                     services: [],
                     timestamp: new Date().toISOString(),
-                    error: error.message
+                    error: error.message,
                 });
             }
-        });
+        }
 
-        this.app.get("/healthcheck", async (req, res) => {
-            try {
-                const healthResult = await this.healthCheckService.checkAllServices();
-
-                if (healthResult.overall === 'healthy') {
-                    res.status(200).json(healthResult);
-                } else {
-                    res.status(503).json(healthResult);
-                }
-            } catch (error: any) {
-                res.status(503).json({
-                    overall: 'unhealthy',
-                    services: [],
-                    timestamp: new Date().toISOString(),
-                    error: error.message
-                });
-            }
-        });
+        this.app.get("/health", requestHealth);
+        this.app.get("/healthcheck", requestHealth);
     }
 
     setupErrorHandling() {
@@ -94,4 +83,4 @@ class App {
     }
 }
 
-export default new App().app
+export default new App().app;
