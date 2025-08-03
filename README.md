@@ -11,7 +11,10 @@ Un template completo para microservicios desarrollado con Node.js, TypeScript y 
 - **Containerización**: Docker y Docker Compose
 - **Health Checks**: Sistema completo de verificación de servicios
 - **Hot Reload**: Nodemon para desarrollo
-- **Arquitectura**: Estructura modular preparada para microservicios
+- **Arquitectura**: Hexagonal (Ports & Adapters) preparada para microservicios
+- **Módulo de Usuarios**: CRUD completo con encriptación de contraseñas
+- **Seguridad**: Middleware de protección de datos personales
+- **Validación**: Schemas con Zod para validación de datos
 
 ## 📋 Requisitos Previos
 
@@ -81,8 +84,44 @@ npm start
 ### Con Docker
 ```bash
 docker build -t microservicios-group16 .
-docker run -p 3000:3000 --network network-mysql microservicios-group16
+docker run -p 3500:3500 microservicios-group16
 ```
+
+## 👤 API de Usuarios
+
+El sistema incluye un módulo completo de gestión de usuarios implementado con arquitectura hexagonal:
+
+### Endpoints disponibles:
+
+- `POST /user/v1` - Crear un nuevo usuario
+- `GET /user/v1/email/:email` - Buscar usuario por email
+- `GET /user/v1/refresh-token/:refreshToken` - Buscar usuario por refresh token
+
+### Ejemplo de uso:
+
+```bash
+# Crear usuario
+curl -X POST http://localhost:3500/user/v1 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "John Doe",
+    "email": "john.doe@example.com", 
+    "password": "securepassword"
+  }'
+
+# Buscar por email
+curl http://localhost:3500/user/v1/email/john.doe@example.com
+
+# Buscar por refresh token
+curl http://localhost:3500/user/v1/refresh-token/8ff68b8d-0dab-4046-a620-53b6ae1715aa
+```
+
+### Características de seguridad:
+
+- **Encriptación de contraseñas**: Usando bcryptjs con salt
+- **Protección de datos**: Middleware que oculta contraseñas en respuestas
+- **Validación**: Schemas con Zod para validar entrada de datos
+- **Refresh Tokens**: Sistema de tokens para autenticación
 
 ## 📊 Health Checks
 
@@ -99,6 +138,35 @@ El sistema incluye un completo sistema de health checks para monitorear todos lo
 
 📖 Ver [HEALTHCHECK.md](./HEALTHCHECK.md) para documentación detallada.
 
+## 🏗️ Arquitectura Hexagonal
+
+El proyecto implementa **Arquitectura Hexagonal** (también conocida como Ports & Adapters) para lograr una separación clara de responsabilidades y alta testabilidad:
+
+### Componentes:
+
+1. **Domain (Dominio)**: 
+   - `user.ts` - Entidades de dominio con lógica de negocio
+   
+2. **Application (Aplicación)**:
+   - `user.application.ts` - Casos de uso y lógica de aplicación
+   
+3. **Ports (Puertos)**:
+   - `user.port.ts` - Interfaces que definen contratos
+   
+4. **Adapters (Adaptadores)**:
+   - **Primary**: `user.controller.ts`, `user.routes.ts` (entrada)
+   - **Secondary**: `user.adapter.ts`, `user.entity.ts` (salida)
+   
+5. **DTOs**: 
+   - `user.dto.ts` - Objetos de transferencia de datos
+
+### Beneficios:
+
+- ✅ **Testabilidad**: Fácil testing unitario mediante mocking de ports
+- ✅ **Mantenibilidad**: Separación clara de responsabilidades
+- ✅ **Flexibilidad**: Intercambio fácil de adaptadores (base de datos, APIs, etc.)
+- ✅ **Independencia**: El dominio no depende de frameworks externos
+
 ## 📁 Estructura del Proyecto
 
 ```
@@ -106,6 +174,7 @@ src/
 ├── app.ts                 # Configuración principal de Express
 ├── index.ts              # Punto de entrada de la aplicación
 ├── env.ts                # Configuración de variables de entorno
+├── requests.http         # Ejemplos de requests para testing
 ├── core/
 │   ├── bootstrap/        # Inicialización de servicios
 │   │   ├── database.bootstrap.ts
@@ -114,10 +183,27 @@ src/
 │   │   ├── redis.bootstrap.ts
 │   │   └── server.bootstrap.ts
 │   ├── middleware/       # Middlewares de Express
-│   │   └── error.middleware.ts
+│   │   ├── error.middleware.ts
+│   │   └── protection-data-personal.middleware.ts
 │   └── services/         # Servicios de infraestructura
-│       └── healthcheck.service.ts
-└── modules/              # Módulos de negocio (agregar aquí tus microservicios)
+│       ├── healthcheck.service.ts
+│       └── cypher.service.ts
+└── modules/              # Módulos de negocio
+    └── user/             # Módulo de usuarios (Arquitectura Hexagonal)
+        ├── application/  # Lógica de negocio
+        │   ├── user.application.ts
+        │   └── user.ts
+        ├── adapters/     # Adaptadores (Secondary Ports)
+        │   ├── user.adapter.ts
+        │   ├── dtos/
+        │   │   └── user.dto.ts
+        │   └── models/
+        │       └── user.entity.ts
+        ├── ports/        # Puertos (Interfaces)
+        │   └── user.port.ts
+        └── presentation/ # Controladores y rutas (Primary Adapters)
+            ├── user.controller.ts
+            └── user.routes.ts
 ```
 
 ## 🔧 Scripts Disponibles
@@ -131,6 +217,7 @@ src/
 - **Error Handling**: Manejo centralizado de errores
 - **JSON Parser**: Procesamiento de requests JSON
 - **URL Encoded**: Soporte para datos de formularios
+- **Protection Data Personal**: Middleware que oculta automáticamente campos sensibles como contraseñas en las respuestas HTTP
 
 ## 🌐 Tecnologías Utilizadas
 
@@ -157,6 +244,9 @@ src/
 ### Desarrollo
 - **Nodemon** - Monitor de cambios para desarrollo
 - **Zod** - Validación de esquemas TypeScript
+
+### Seguridad
+- **bcryptjs** - Encriptación de contraseñas con salt
 
 ## 🤝 Contribución
 
