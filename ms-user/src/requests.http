@@ -1,0 +1,16 @@
+### Create
+post http://localhost:3500/user/v1
+Content-Type: application/json
+
+{
+  "name": "John Doe",
+  "email": "john.doe@example.com",
+  "password": "securepassword"
+}
+
+### Search for email
+get http://localhost:3500/user/v1/email/john.doe@example.com
+
+
+### Search for refresh token
+get http://localhost:3500/user/v1/refresh-token/8ff68b8d-0dab-4046-a620-53b6ae1715aa
