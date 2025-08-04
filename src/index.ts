@@ -1,29 +1,14 @@
-import { DatabaseBootstrap, RabbitMQBootstrap, RedisBootstrap, KafkaBootstrap, ServerBootstrap } from "@core/bootstrap";
+import { ServerBootstrap } from "@core/bootstrap";
 import app from "./app"
 import "./env"
 
 (async () => {
-    // Server NodeJS
-    // Database Relacional
-    // Cache Redis
-    // Queue RabbitMQ
-    // Transactions Kafka
-    // Microservices
-    // Tasks Cron
 
     try {
         const serverBootstrap = new ServerBootstrap(app);
-        const databaseBootstrap = new DatabaseBootstrap();
-        const rabbitMQBootstrap = new RabbitMQBootstrap();
-        const redisBootstrap = new RedisBootstrap();
-        const kafkaBootstrap = new KafkaBootstrap();
 
         const listeningPromises = [
             serverBootstrap.initialize(),
-            databaseBootstrap.initialize(),
-            rabbitMQBootstrap.initialize(),
-            kafkaBootstrap.initialize(),
-            redisBootstrap.initialize()
         ]
 
         const results = await Promise.all(listeningPromises)
