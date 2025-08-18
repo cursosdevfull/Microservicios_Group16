@@ -1,7 +1,5 @@
 import z from "zod";
 import { AuthApplication } from "../application/auth.application";
-import { Tokens } from "../types/tokens";
-import { User } from "../types/user";
 import { Request, Response } from "express";
 
 export class AuthController {

@@ -1,0 +1,19 @@
+### Login
+post http://localhost:3070/api/login
+Content-Type: application/json
+
+{
+  "email": "john.doe@example.com",
+  "password": "securepassword"
+}
+
+### Create Appointment
+post http://localhost:3070/api/create-appointment
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImpvaG4uZG9lQGV4YW1wbGUuY29tIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNzU1NDc3NDY3LCJleHAiOjE3NTU0OTU0Njd9.ZQaVS407D82wj1frhNobcH11FtG9HzxD9yorfAh0DgM
+
+{
+    "scheduleId": "4b257b53-675b-4509-8732-b8e4b51c987b",
+    "userId": "db0a74b7-992e-46c9-b91b-39b514b59974",
+    "countryISO": "PE"
+}

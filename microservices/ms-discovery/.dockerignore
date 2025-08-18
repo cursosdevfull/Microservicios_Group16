@@ -3,3 +3,4 @@ dist
 Dockerfile
 compose.yml
 requests.http
+.env

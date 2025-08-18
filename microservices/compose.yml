@@ -2,6 +2,7 @@ services:
   mysql-server:
     image: mysql:8
     container_name: mysql-server
+    profiles: [microservices]    
     environment:
       MYSQL_ROOT_PASSWORD: 12345
       MYSQL_DATABASE: db
@@ -22,6 +23,7 @@ services:
   mysql-client:
     image: phpmyadmin
     container_name: mysql-client
+    profiles: [microservices]      
     ports:
       - "8080:80"
     depends_on:
@@ -43,6 +45,7 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
+    profiles: [others]      
     environment:
       RABBITMQ_DEFAULT_USER: user
       RABBITMQ_DEFAULT_PASS: 12345
@@ -60,6 +63,7 @@ services:
     container_name: redis-server
     ports:
       - "6380:6379"
+    profiles: [others]      
     healthcheck:
       test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
       interval: 10s
@@ -74,6 +78,7 @@ services:
     container_name: redis-client
     ports:
       - "8081:8081"
+    profiles: [others]      
     depends_on:
       redis-server:
         condition: service_healthy
@@ -94,6 +99,7 @@ services:
     image: confluentinc/cp-zookeeper:latest
     container_name: zookeeper
     hostname: zookeeper
+    profiles: [microservices]     
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
@@ -111,6 +117,7 @@ services:
   kafka:
     image: confluentinc/cp-kafka:7.4.0
     container_name: kafka
+    profiles: [microservices]     
     ports:
       - "9092:9092"
     depends_on:
@@ -137,6 +144,7 @@ services:
     container_name: kafka-ui
     ports:
       - "8082:8080"
+    profiles: [microservices]        
     depends_on:
       kafka:
         condition: service_healthy
@@ -144,11 +152,21 @@ services:
       KAFKA_CLUSTERS_0_NAME: "Local Kafka"
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: "kafka:29092"
       KAFKA_CLUSTERS_0_ZOOKEEPER: "zookeeper:2181"
-    # healthcheck:
-    #   test: ["CMD", "curl", "-f", "http://localhost:8082"]
-    #   interval: 10s
-    #   timeout: 8s
-    #   retries: 3
+    networks:
+      - network-mysql
+
+  ms-discovery:
+    image: discovery
+    build:
+      context: ./ms-discovery
+      dockerfile: Dockerfile
+    container_name: ms-discovery
+    profiles: [microservices]    
+    ports:
+      - "8010:8010"
+    environment:
+      PORT: "8010"
+    restart: unless-stopped
     networks:
       - network-mysql
 

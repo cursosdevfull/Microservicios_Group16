@@ -1,0 +1,9 @@
+### Create Appointment
+POST http://localhost:3030/appointment/v1
+Content-Type: application/json
+
+{
+    "scheduleId": "4b257b53-675b-4509-8732-b8e4b51c987b",
+    "userId": "db0a74b7-992e-46c9-b91b-39b514b59974",
+    "countryISO": "CO"
+}
