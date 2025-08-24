@@ -16,6 +16,7 @@ COPY . .
 RUN npm run build
 
 FROM stage_base AS stage_production
+RUN apk add curl -y
 COPY --from=stage_build /app/dist ./dist
 COPY --from=stage_deps /app/node_modules ./node_modules
 COPY --from=stage_build /app/package.json ./package.json

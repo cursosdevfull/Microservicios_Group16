@@ -161,7 +161,12 @@ services:
       context: ./ms-discovery
       dockerfile: Dockerfile
     container_name: ms-discovery
-    profiles: [microservices]    
+    profiles: [microservices]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8010/healthcheck"]
+      interval: 10s
+      timeout: 8s
+      retries: 3
     ports:
       - "8010:8010"
     environment:
@@ -169,6 +174,49 @@ services:
     restart: unless-stopped
     networks:
       - network-mysql
+
+  ms-user:
+    image: user
+    build:
+      context: ./ms-user
+      dockerfile: Dockerfile
+    container_name: ms-user
+    profiles: [microservices]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8020/healthcheck"]
+      interval: 10s
+      timeout: 8s
+      retries: 3
+    ports:
+      - "8020:8020"
+    env_file: 
+      - ./ms-user/environments/env.txt
+    restart: unless-stopped
+    networks:
+      - network-mysql
+
+  ms-auth:
+    image: auth
+    build:
+      context: ./ms-auth
+      dockerfile: Dockerfile
+    container_name: ms-auth
+    profiles: [microservices]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8030/healthcheck"]
+      interval: 10s
+      timeout: 8s
+      retries: 3
+    ports:
+      - "8030:8030"
+    env_file: 
+      - ./ms-auth/environments/env.txt
+    restart: unless-stopped
+    depends_on:
+      ms-user:
+        condition: service_healthy
+    networks:
+      - network-mysql         
 
 volumes:
   mysql-data:
